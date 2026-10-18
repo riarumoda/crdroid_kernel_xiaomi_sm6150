@@ -907,6 +907,7 @@ int adreno_iommu_set_pt_ctx(struct adreno_ringbuffer *rb,
 	struct kgsl_device *device = KGSL_DEVICE(adreno_dev);
 	struct kgsl_pagetable *cur_pt = device->mmu.defaultpagetable;
 	int result = 0;
+	int ctxt_result;
 	int cpu_path = 0;
 
 	/* Just do the context switch incase of NOMMU */
@@ -949,10 +950,12 @@ int adreno_iommu_set_pt_ctx(struct adreno_ringbuffer *rb,
 	 * hardware state in the ringbuffer.
 	 */
 	if (result && (new_pt != cur_pt)) {
+		ctxt_result = result;
 		if (cpu_path)
 			result = _set_pagetable_cpu(rb, cur_pt);
 		else
 			result = _set_pagetable_gpu(rb, cur_pt);
+		result = ctxt_result;
 	}
 
 	return result;
